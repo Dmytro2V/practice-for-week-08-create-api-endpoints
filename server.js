@@ -54,6 +54,9 @@ const server = http.createServer((req, res) => {
     // GET /dogs
     if (req.method === 'GET' && req.url === '/dogs') {
       // Your code here
+      res.write(JSON.stringify(dogs));
+      res.end();
+      return;
     }
 
     // GET /dogs/:dogId
@@ -61,14 +64,33 @@ const server = http.createServer((req, res) => {
       const urlParts = req.url.split('/'); // ['', 'dogs', '1']
       if (urlParts.length === 3) {
         const dogId = urlParts[2];
+        console.log(typeof dogId);
         // Your code here
-      }
+        let dog = dogs.find(dog => String(dog.dogId) === dogId);
+        console.log('dog = ', dog);
+        console.log('json = ', JSON.stringify(dog));
+        res.write(JSON.stringify(dog));
+        res.end();
+        return;
+      }      
     }
 
     // POST /dogs
     if (req.method === 'POST' && req.url === '/dogs') {
       const { name, age } = req.body;
       // Your code here
+      const newDogId = getNewDogId()
+      let newDog = {
+        dogId: newDogId,
+        name,
+        age
+      };
+      dogs.push(newDog);
+      res.setHeader('Content-type', 'application/json');
+      res.write(JSON.stringify(newDog))
+      res.end();
+      return;
+
     }
 
     // PUT or PATCH /dogs/:dogId
@@ -77,6 +99,19 @@ const server = http.createServer((req, res) => {
       if (urlParts.length === 3) {
         const dogId = urlParts[2];
         // Your code here
+        const { name, age } = req.body;
+        console.log('dogId', dogId);
+        console.log('dogs', dogs);
+        let dog = dogs.find(dog => String(dog.dogId) === dogId);
+        console.log('dog = ', dog);
+        console.log('json = ', JSON.stringify(dog));
+        // updating:
+        dog.name = name;
+        dog.age = age;
+        console.log('updated dog', dog);
+        res.write(JSON.stringify(dog));
+        res.end();
+        return;
       }
     }
 
@@ -86,6 +121,14 @@ const server = http.createServer((req, res) => {
       if (urlParts.length === 3) {
         const dogId = urlParts[2];
         // Your code here
+        let dogIndex = dogs.findIndex(dog => String(dog.dogId) === dogId);
+        dogs.splice(dogIndex);
+        res.write(JSON.stringify("Dog #"));
+        res.write(JSON.stringify(dogIndex + 1));
+        res.write(JSON.stringify(" succesfully deleted"));
+        res.end();
+        return;
+      
       }
     }
 
